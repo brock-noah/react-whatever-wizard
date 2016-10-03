@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './App.css';
+import './Example.css';
 import { WhateverWizard, Step, StepButton } from './WhateverWizard';
 
 const Step1 = (props) => 
@@ -13,10 +13,10 @@ const Step2 = (props) =>
     <p>This is step two</p>
   </div>;
 
-class App extends Component {
+class Example extends Component {
   render() {
     return (
-      <div className="App">
+      <div className="Example">
         WhateverWizard
         <WhateverWizard>
           <Step componentClass={Step1}>
@@ -31,4 +31,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default Example;
