@@ -2,15 +2,16 @@ import React, { Component } from 'react';
 import './Example.css';
 import { WhateverWizard, Step, StepButton } from './WhateverWizard';
 
-const Step1 = (props) => 
-  <div>
-    <h1>Step 1</h1>
-    <p>This is step one</p>
+const SomeStep = (props) =>
+  <div style={{color: props.color}}>
+    <h1>Step {props.stepNumber}</h1>
+    <p>This is a step</p>
   </div>;
-const Step2 = (props) =>
+
+const AnotherStep = (props) =>
   <div>
-    <h1>Step 2</h1>
-    <p>This is step two</p>
+    <h1>Step {props.stepNumber}</h1>
+    <p>This is another step</p>
   </div>;
 
 class Example extends Component {
@@ -19,11 +20,11 @@ class Example extends Component {
       <div className="Example">
         WhateverWizard
         <WhateverWizard>
-          <Step componentClass={Step1}>
+          <Step componentClass={SomeStep} componentProps={{color: 'slateblue'}}>
             <StepButton role="next">Next</StepButton>
           </Step>
-          <Step componentClass={Step2}>
-            <StepButton role="back">Back</StepButton>
+          <Step componentClass={AnotherStep}>
+            <StepButton role="back" componentProps={{title: 'Go Back'}}>Back</StepButton>
           </Step>
         </WhateverWizard>
       </div>
