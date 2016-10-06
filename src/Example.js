@@ -3,7 +3,7 @@ import './Example.css';
 import { WhateverWizard, Step, StepButton } from './WhateverWizard';
 
 const SomeStep = (props) =>
-  <div style={{color: props.color}}>
+  <div style={{color: props.color || 'black'}}>
     <h1>Step {props.stepNumber}</h1>
     <p>This is a step</p>
   </div>;
@@ -24,7 +24,12 @@ class Example extends Component {
             <StepButton role="next">Next</StepButton>
           </Step>
           <Step componentClass={AnotherStep}>
-            <StepButton role="back" componentProps={{title: 'Go Back'}}>Back</StepButton>
+            <StepButton role="back">Back</StepButton>
+            <StepButton role="next">Proceed</StepButton>
+          </Step>
+          <Step componentClass={SomeStep}>
+            <StepButton role="first" componentProps={{title: 'Restart'}}>Back to 1</StepButton>
+            <StepButton role="back">Back</StepButton>
           </Step>
         </WhateverWizard>
       </div>

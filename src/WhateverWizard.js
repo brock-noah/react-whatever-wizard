@@ -5,14 +5,58 @@ function arrayAssure(thing) {
   return Array.isArray(thing) ? thing : [thing];
 }
 
-/* Creates Step Config and manages step state */
-function StepState(Component) {
-  return class StepConfig extends React.Component {
+function StateManager(Component) {
+  return class WizardState extends React.Component {
     state = {
-      active: 0,
+      active: 0
     };
 
-    // needs work
+    back = () => {
+      this.setState({ active: this.state.active - 1 });
+    }
+
+    next = () => {
+      this.setState({ active: this.state.active + 1 });
+    }
+
+    jumpTo = (idx) => {
+      this.setState({ active: idx });
+    }
+
+    first = () => {
+      this.jumpTo(0);
+    }
+
+    // TODO
+    // last = (last) => {
+    //   this.jumpTo(last);
+    // }
+
+    generate = () => {
+      return ({
+        back: this.back,
+        next: this.next,
+        first: this.first
+      });
+    }
+
+    render() {
+      return (
+        <Component {...{
+          ...this.props,
+          navActions: this.generate(),
+          activeStepNumber: this.state.active
+        }} />
+      );
+    }
+  }
+}
+
+/* Creates Step Config and manages step state */
+function ConfigCreator(Component) {
+  return class StepConfig extends React.Component {
+
+    // needs work - might be unnecessary
     createStepConfig = (elements) => {
       return arrayAssure(elements).reduce((acc, step, i) => {
         return acc.concat([{
@@ -29,28 +73,13 @@ function StepState(Component) {
               componentProps: button.props.componentProps,
               role: button.props.role,
               onClick: e => {
-                this.getRole(button.props.role)();
+                this.props.navActions[button.props.role]();
                 button.props.onClick && button.props.onClick(e);
               }
             }])
           }, []),
         }]);
       }, []);
-    }
-
-    getRole = (role) => {
-      switch (role) {
-        case typeof role === 'function':
-          return role;
-        case 'next':
-          return () => this.setState({active: this.state.active + 1});
-        case 'back':
-          return () => this.setState({active: this.state.active - 1});
-        case 'restart':
-          return () => this.setState({active: 0});
-        default:
-          return () => {};
-      }
     }
 
     render() {
@@ -60,7 +89,7 @@ function StepState(Component) {
         <Component {...{
           ...this.props,
           stepConfig,
-          step: stepConfig[this.state.active],
+          step: stepConfig[this.props.activeStepNumber],
         }} />
       );
     }
@@ -118,7 +147,7 @@ export function Wizard({step}) {
   );
 }
 
-export const WhateverWizard = StepState(Wizard);
+export const WhateverWizard = StateManager(ConfigCreator(Wizard));
 
 export default {
   WhateverWizard,
