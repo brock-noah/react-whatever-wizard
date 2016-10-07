@@ -99,7 +99,7 @@ function ConfigCreator(Component) {
 StepButton.propTypes = {
   componentClass: PT.oneOfType([PT.func, PT.string]),
   componentProps: PT.object,
-  role: PT.oneOf(['next', 'back', 'finish', 'restart'])
+  role: PT.oneOf(['next', 'back', 'first'])
 };
 
 StepButton.defaultProps = {
