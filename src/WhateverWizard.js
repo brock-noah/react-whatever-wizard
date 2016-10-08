@@ -1,4 +1,5 @@
 import React, { PropTypes as PT } from 'react';
+import cx from 'classnames';
 
 /* Util */
 function arrayAssure(thing) {
@@ -52,50 +53,6 @@ function StateManager(Component) {
   }
 }
 
-/* Creates Step Config and manages step state */
-function ConfigCreator(Component) {
-  return class StepConfig extends React.Component {
-
-    // needs work - might be unnecessary
-    createStepConfig = (elements) => {
-      return arrayAssure(elements).reduce((acc, step, i) => {
-        return acc.concat([{
-          name: step.props.name || i.toString(),
-          number: i + 1,
-          isFirst: i === 0,
-          isLast: i === arrayAssure(elements).length + 1,
-          componentClass: step.props.componentClass,
-          componentProps: step.props.componentProps,
-          buttons: arrayAssure(step.props.children).reduce((inAcc, button, j) => {
-            return inAcc.concat([{
-              children: button.props.children,
-              componentClass: button.props.componentClass || 'button',
-              componentProps: button.props.componentProps,
-              role: button.props.role,
-              onClick: e => {
-                this.props.navActions[button.props.role]();
-                button.props.onClick && button.props.onClick(e);
-              }
-            }])
-          }, []),
-        }]);
-      }, []);
-    }
-
-    render() {
-      const stepConfig = this.createStepConfig(this.props.children);
-
-      return (
-        <Component {...{
-          ...this.props,
-          stepConfig,
-          step: stepConfig[this.props.activeStepNumber],
-        }} />
-      );
-    }
-  }
-}
-
 StepButton.propTypes = {
   componentClass: PT.oneOfType([PT.func, PT.string]),
   componentProps: PT.object,
@@ -103,51 +60,116 @@ StepButton.propTypes = {
 };
 
 StepButton.defaultProps = {
-}
+  componentClass: 'button',
+  componentProps: {},
+};
 
-export function StepButton(props) {
-  return props;
+export function StepButton({
+  componentClass: Cmp,
+  componentProps,
+  navActions,
+  ...props
+}) {
+  debugger;
+  return (
+    <Cmp {...{
+      ...componentProps,
+      ...props,
+      onClick: props.navActions.next
+    }}>{props.children}</Cmp>
+  );
 }
 
 Step.propTypes = {
   componentClass: PT.oneOfType([PT.func, PT.string]),
   componentProps: PT.object,
   name: PT.string,
-  stepNumber: PT.number
+  displayNumber: PT.number,
+  isFirst: PT.bool,
+  isLast: PT.bool,
+  number: PT.number,
 };
 
 Step.defaultProps = {
-  componentClass: 'div'
-}
+  componentClass: 'div',
+  componentProps: {},
+  className: '',
+  displayNumber: 0,
+  isFirst: false,
+  isLast: false,
+  number: 0,
+};
 
-export function Step(props) {
-  return props;
-}
+export function Step({
+  componentClass: Cmp,
+  componentProps,
+  displayNumber,
+  isFirst,
+  isLast,
+  number,
+  ...props
+}) {
 
-Wizard.propTypes = {};
-Wizard.defaultProps = {};
-
-/* Wizard render of active step */
-export function Wizard({step}) {
-  let wizClass = `whatever-wizard ww-step--${step.number}`;
-  if (step.isFirst) { wizClass += ' ww-step--first'; }
-  if (step.isLast)  { wizClass += ' ww-step--last'; }
+  const className = cx(
+    `ww-step ww-step--${displayNumber}`,
+    {'ww-step--last': isLast, 'ww-step--first': isFirst}
+  );
 
   return (
-    <div className={wizClass}>
-      <main className='ww-step'>
-        <step.componentClass {...{...step, ...step.componentProps, stepNumber: step.number }} />
-      </main>
-      <nav className='ww-nav'>
-        {step.buttons.map((sb, i) =>
-          <sb.componentClass {...{...sb.componentProps, children: sb.children, key: i, onClick: sb.onClick }} />
-        )}
-      </nav>
+    <div {...{className}}>
+      <Cmp {...{
+        ...componentProps,
+        ...props,
+      }}>{props.children}</Cmp>
     </div>
   );
 }
 
-export const WhateverWizard = StateManager(ConfigCreator(Wizard));
+
+export class Wizard extends React.Component {
+  static propTypes = {
+    activeStepNumber: PT.number,
+    navActions: PT.object,
+  };
+
+  static defaultProps = {
+    activeStepNumber: 0,
+    navActions: {},
+  };
+
+  makeNumber = (i, total) => ({
+    number: i,
+    displayNumber: i + 1,
+    isFirst: i === 0,
+    isLast: i === total,
+  });
+
+  make = (elements, navActions, makeNumberData = this.makeNumber) =>
+    elements.reduce((acc, curr, i, all) => {
+      const elem = {
+        ...curr,
+        props: {
+          ...curr.props,
+          ...makeNumberData(i, all.length - 1),
+          navActions
+      }};
+      return ([...acc, elem ]);
+    }, []);
+
+  render() {
+    const {
+      navActions
+    } = this.props;
+
+    return (
+      <div className="whatever-wizard">
+        {this.make(arrayAssure(this.props.children), navActions)}
+      </div>
+    );
+  }
+}
+
+export const WhateverWizard = StateManager(Wizard);
 
 export default {
   WhateverWizard,
