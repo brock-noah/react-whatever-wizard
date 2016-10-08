@@ -120,6 +120,10 @@ export function Step({
       <Cmp {...{
         ...componentProps,
         ...props,
+        displayNumber,
+        isFirst,
+        isLast,
+        number
       }}>{props.children}</Cmp>
     </div>
   );

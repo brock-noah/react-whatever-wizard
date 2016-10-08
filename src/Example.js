@@ -4,13 +4,14 @@ import { WhateverWizard, Step, StepButton } from './WhateverWizard';
 
 const SomeStep = (props) =>
   <div style={{color: props.color || 'black'}}>
-    <h1>Step {props.stepNumber}</h1>
+    <h1>Step {props.displayNumber}</h1>
     <p>This is a step</p>
+    <p>Last step? {String(props.isLast)}</p>
   </div>;
 
 const AnotherStep = (props) =>
   <div>
-    <h1>Step {props.stepNumber}</h1>
+    <h1>Step {props.displayNumber}</h1>
     <p>This is another step</p>
   </div>;
 
