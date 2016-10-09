@@ -56,77 +56,115 @@ function StateManager(Component) {
 StepButton.propTypes = {
   componentClass: PT.oneOfType([PT.func, PT.string]),
   componentProps: PT.object,
-  role: PT.oneOf(['next', 'back', 'first'])
+  role: PT.oneOf(['next', 'back', 'first']),
+  isFirst: PT.bool,
+  isLast: PT.bool,
+  navActions: PT.object,
+  number: PT.number,
 };
 
 StepButton.defaultProps = {
   componentClass: 'button',
   componentProps: {},
+  isFirst: false,
+  isLast: false,
+  navActions: {},
+  number: 0,
 };
 
 export function StepButton({
   componentClass: Cmp,
   componentProps,
   navActions,
+  role,
   ...props
 }) {
-  debugger;
+
   return (
     <Cmp {...{
       ...componentProps,
       ...props,
-      onClick: props.navActions.next
+      onClick: navActions[role]
     }}>{props.children}</Cmp>
   );
 }
 
-Step.propTypes = {
-  componentClass: PT.oneOfType([PT.func, PT.string]),
-  componentProps: PT.object,
-  name: PT.string,
-  displayNumber: PT.number,
-  isFirst: PT.bool,
-  isLast: PT.bool,
-  number: PT.number,
-};
 
-Step.defaultProps = {
-  componentClass: 'div',
-  componentProps: {},
-  className: '',
-  displayNumber: 0,
-  isFirst: false,
-  isLast: false,
-  number: 0,
-};
 
-export function Step({
-  componentClass: Cmp,
-  componentProps,
-  displayNumber,
-  isFirst,
-  isLast,
-  number,
-  ...props
-}) {
+export class Step extends React.Component {
 
-  const className = cx(
-    `ww-step ww-step--${displayNumber}`,
-    {'ww-step--last': isLast, 'ww-step--first': isFirst}
-  );
+  static propTypes = {
+    componentClass: PT.oneOfType([PT.func, PT.string]),
+    componentProps: PT.object,
+    name: PT.string,
+    displayNumber: PT.number,
+    isFirst: PT.bool,
+    isLast: PT.bool,
+    navActions: PT.object,
+    number: PT.number,
+  };
 
-  return (
-    <div {...{className}}>
-      <Cmp {...{
-        ...componentProps,
-        ...props,
-        displayNumber,
-        isFirst,
-        isLast,
-        number
-      }}>{props.children}</Cmp>
-    </div>
-  );
+  static defaultProps = {
+    componentClass: 'div',
+    componentProps: {},
+    className: '',
+    displayNumber: 0,
+    isFirst: false,
+    isLast: false,
+    navActions: {},
+    number: 0,
+  };
+
+  make = (elements, props) =>
+    elements.reduce((acc, curr, i, all) => {
+      const elem = {
+        ...curr,
+        props: {
+          ...curr.props,
+          ...props,
+      }};
+      return ([...acc, elem]);
+    }, []);
+
+  render() {
+    const {
+      activeStepNumber,
+      componentClass: Cmp,
+      componentProps,
+      displayNumber,
+      isFirst,
+      isLast,
+      navActions,
+      number,
+      ...props
+    } = this.props;
+
+    const className = cx(
+      `ww-step ww-step--${displayNumber}`,
+      {'ww-step--last': isLast, 'ww-step--first': isFirst}
+    );
+
+    const style = (number !== activeStepNumber) ? {display: 'none'} : {};
+
+    const propsToChildren = {navActions, number, isFirst, isLast};
+
+    return (
+      <div {...{className, style}}>
+        <Cmp {...{
+          ...componentProps,
+          ...props,
+          displayNumber,
+          isFirst,
+          isLast,
+          navActions,
+          number
+        }} />
+        <div>
+          {this.make(arrayAssure(props.children), propsToChildren)}
+        </div>
+      </div>
+    );
+  }
 }
 
 
@@ -148,26 +186,29 @@ export class Wizard extends React.Component {
     isLast: i === total,
   });
 
-  make = (elements, navActions, makeNumberData = this.makeNumber) =>
+  make = (elements, props, makeNumberData = this.makeNumber) =>
     elements.reduce((acc, curr, i, all) => {
       const elem = {
         ...curr,
         props: {
           ...curr.props,
+          ...props,
           ...makeNumberData(i, all.length - 1),
-          navActions
       }};
       return ([...acc, elem ]);
     }, []);
 
+
   render() {
     const {
+      activeStepNumber,
       navActions
     } = this.props;
+    const propsToChildren = {activeStepNumber, navActions};
 
     return (
       <div className="whatever-wizard">
-        {this.make(arrayAssure(this.props.children), navActions)}
+        {this.make(arrayAssure(this.props.children), propsToChildren)}
       </div>
     );
   }
