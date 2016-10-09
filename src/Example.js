@@ -13,6 +13,7 @@ const AnotherStep = (props) =>
   <div>
     <h1>Step {props.displayNumber}</h1>
     <p>This is another step</p>
+    <button onClick={props.navActions.first}>Restart</button>
   </div>;
 
 class Example extends Component {
@@ -24,14 +25,14 @@ class Example extends Component {
           <Step componentClass={SomeStep} componentProps={{color: 'slateblue'}}>
             <StepButton
               preRole={() => alert('welcome to help')}
-              role={(actions) => alert('???')}
-              postRole={() => alert('404')}
+              role={(actions, post) => alert('404')}
+              postRole={() => alert('???')}
             >Help Me</StepButton>
             <StepButton role="next">Next</StepButton>
           </Step>
           <Step componentClass={AnotherStep}>
             <StepButton role="back">Back</StepButton>
-            <StepButton role="next">Proceed</StepButton>
+            <StepButton role="next" preRole={() => confirm('go')}>Proceed</StepButton>
           </Step>
           <Step componentClass={SomeStep}>
             <StepButton role="first" componentClass="a" componentProps={{title: 'Restart', href: '#'}}>Back to 1</StepButton>

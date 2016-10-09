@@ -2,6 +2,7 @@ import React, { PropTypes as PT } from 'react';
 import cx from 'classnames';
 
 /* Util */
+const _e = () => {};
 function arrayAssure(thing) {
   return Array.isArray(thing) ? thing : [thing];
 }
@@ -12,20 +13,20 @@ function StateManager(Component) {
       active: 0
     };
 
-    back = () => {
-      this.setState({ active: this.state.active - 1 });
+    back = (cb = _e) => {
+      this.setState({ active: this.state.active - 1 }, cb);
     }
 
-    next = () => {
-      this.setState({ active: this.state.active + 1 });
+    next = (cb = _e) => {
+      this.setState({ active: this.state.active + 1 }, cb);
     }
 
-    first = () => {
+    first = (cb = _e) => {
       this._jumpTo(0);
     }
 
-    _jumpTo = (idx) => {
-      this.setState({ active: idx });
+    _jumpTo = (idx, cb) => {
+      this.setState({ active: idx }, cb);
     }
 
     // TODO
@@ -79,15 +80,20 @@ export function StepButton({
   componentClass: Cmp,
   componentProps,
   navActions,
-  postRole,
-  preRole,
+  postRole = () => {},
+  preRole = () => {},
   role,
   ...props
 }) {
   const onClick = () => {
-    preRole && preRole();
-    (typeof role === 'string') ? navActions[role]() : role(navActions);
-    postRole && postRole();
+    const go = preRole();
+    if ( go || typeof go === 'undefined' ) {
+      if ( typeof role === 'string' ) {
+        navActions[role](postRole);
+      } else {
+        role(navActions, postRole);
+      }
+    }
   }
 
   return (
