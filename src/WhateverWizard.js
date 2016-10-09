@@ -139,12 +139,14 @@ export class Step extends React.Component {
       ...props
     } = this.props;
 
+    const active = (number === activeStepNumber);
+
     const className = cx(
       `ww-step ww-step--${displayNumber}`,
-      {'ww-step--last': isLast, 'ww-step--first': isFirst}
+      {'ww-step--last': isLast, 'ww-step--first': isFirst, 'ww-step--active': active}
     );
 
-    const style = (number !== activeStepNumber) ? {display: 'none'} : {};
+    const style = !active ? {display: 'none'} : {};
 
     const propsToChildren = {navActions, number, isFirst, isLast};
 
@@ -159,7 +161,7 @@ export class Step extends React.Component {
           navActions,
           number
         }} />
-        <div>
+        <div {...{className: 'ww-button-bar'}}>
           {this.make(arrayAssure(props.children), propsToChildren)}
         </div>
       </div>
@@ -202,12 +204,20 @@ export class Wizard extends React.Component {
   render() {
     const {
       activeStepNumber,
+      children,
       navActions
     } = this.props;
     const propsToChildren = {activeStepNumber, navActions};
 
+    const className = cx('whatever-wizard', {
+      'ww-first-is-active':
+        0 === activeStepNumber,
+      'ww-last-is-active':
+        (arrayAssure(children).length - 1) === activeStepNumber
+    });
+
     return (
-      <div className="whatever-wizard">
+      <div {...{className}}>
         {this.make(arrayAssure(this.props.children), propsToChildren)}
       </div>
     );

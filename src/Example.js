@@ -19,7 +19,7 @@ class Example extends Component {
   render() {
     return (
       <div className="Example">
-        WhateverWizard
+        <h1>WhateverWizard</h1>
         <WhateverWizard>
           <Step componentClass={SomeStep} componentProps={{color: 'slateblue'}}>
             <StepButton role="next">Next</StepButton>
@@ -29,7 +29,7 @@ class Example extends Component {
             <StepButton role="next">Proceed</StepButton>
           </Step>
           <Step componentClass={SomeStep}>
-            <StepButton role="first" componentProps={{title: 'Restart'}}>Back to 1</StepButton>
+            <StepButton role="first" componentClass="a" componentProps={{title: 'Restart', href: '#'}}>Back to 1</StepButton>
             <StepButton role="back">Back</StepButton>
           </Step>
         </WhateverWizard>
