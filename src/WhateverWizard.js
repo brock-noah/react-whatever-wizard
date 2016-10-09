@@ -20,12 +20,12 @@ function StateManager(Component) {
       this.setState({ active: this.state.active + 1 });
     }
 
-    jumpTo = (idx) => {
-      this.setState({ active: idx });
+    first = () => {
+      this._jumpTo(0);
     }
 
-    first = () => {
-      this.jumpTo(0);
+    _jumpTo = (idx) => {
+      this.setState({ active: idx });
     }
 
     // TODO
@@ -61,6 +61,8 @@ StepButton.propTypes = {
   isLast: PT.bool,
   navActions: PT.object,
   number: PT.number,
+  postRole: PT.func,
+  preRole: PT.func,
 };
 
 StepButton.defaultProps = {
@@ -70,21 +72,29 @@ StepButton.defaultProps = {
   isLast: false,
   navActions: {},
   number: 0,
+  role: () => {},
 };
 
 export function StepButton({
   componentClass: Cmp,
   componentProps,
   navActions,
+  postRole,
+  preRole,
   role,
   ...props
 }) {
+  const onClick = () => {
+    preRole && preRole();
+    (typeof role === 'string') ? navActions[role]() : role(navActions);
+    postRole && postRole();
+  }
 
   return (
     <Cmp {...{
       ...componentProps,
       ...props,
-      onClick: navActions[role]
+      onClick
     }}>{props.children}</Cmp>
   );
 }
@@ -96,7 +106,6 @@ export class Step extends React.Component {
   static propTypes = {
     componentClass: PT.oneOfType([PT.func, PT.string]),
     componentProps: PT.object,
-    name: PT.string,
     displayNumber: PT.number,
     isFirst: PT.bool,
     isLast: PT.bool,
@@ -188,16 +197,16 @@ export class Wizard extends React.Component {
     isLast: i === total,
   });
 
-  make = (elements, props, makeNumberData = this.makeNumber) =>
+  make = (elements, props, counterCb = this.makeNumber) =>
     elements.reduce((acc, curr, i, all) => {
       const elem = {
         ...curr,
         props: {
           ...curr.props,
           ...props,
-          ...makeNumberData(i, all.length - 1),
+          ...counterCb(i, all.length - 1),
       }};
-      return ([...acc, elem ]);
+      return ([...acc, elem]);
     }, []);
 
 
@@ -218,7 +227,7 @@ export class Wizard extends React.Component {
 
     return (
       <div {...{className}}>
-        {this.make(arrayAssure(this.props.children), propsToChildren)}
+        {this.make(arrayAssure(children), propsToChildren)}
       </div>
     );
   }

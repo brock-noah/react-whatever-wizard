@@ -12,3 +12,12 @@ Declarative component based wizard
   </Step>
 </WhateverWizard>
 ```
+
+You get wizard props in your view component/function
+Manges which page to show, and roles to change the page
+Classes for active step status
+
+
+role
+next, back, first
+function (actions) =>

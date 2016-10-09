@@ -22,6 +22,11 @@ class Example extends Component {
         <h1>WhateverWizard</h1>
         <WhateverWizard>
           <Step componentClass={SomeStep} componentProps={{color: 'slateblue'}}>
+            <StepButton
+              preRole={() => alert('welcome to help')}
+              role={(actions) => alert('???')}
+              postRole={() => alert('404')}
+            >Help Me</StepButton>
             <StepButton role="next">Next</StepButton>
           </Step>
           <Step componentClass={AnotherStep}>
