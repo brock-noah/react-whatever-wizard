@@ -23,7 +23,7 @@ Provides:
 </WhateverWizard>
 ```
 
-`exampleStep.jsx`
+`Step.jsx`
 ```
 const Step = (props) =>
   <div style={{color: props.color || 'black'}}>
@@ -44,7 +44,7 @@ To change the active step state, you will use the role prop.
 
 #### `preRole`
 ##### `function(): boolean`
-Function fired before `role.
+Function fired before `role`.
 If you return a falsey value besides `undefined`, `role` and `postRole` will not fire.
 
 #### `role`
@@ -59,6 +59,6 @@ If role is a function, you will have to call this function.
 It is provided as the second argument to role.
 
 
-### 'navActions: object'
+### `navActions: object`
 #### `action` function(callback)`
 actions:  `back`, `first`, `next`
