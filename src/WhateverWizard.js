@@ -1,6 +1,8 @@
 import React, { PropTypes as PT } from 'react';
+import cx from 'classnames';
 
 /* Util */
+const _e = () => {};
 function arrayAssure(thing) {
   return Array.isArray(thing) ? thing : [thing];
 }
@@ -11,20 +13,20 @@ function StateManager(Component) {
       active: 0
     };
 
-    back = () => {
-      this.setState({ active: this.state.active - 1 });
+    back = (cb = _e) => {
+      this.setState({ active: this.state.active - 1 }, cb);
     }
 
-    next = () => {
-      this.setState({ active: this.state.active + 1 });
+    next = (cb = _e) => {
+      this.setState({ active: this.state.active + 1 }, cb);
     }
 
-    jumpTo = (idx) => {
-      this.setState({ active: idx });
+    first = (cb = _e) => {
+      this._jumpTo(0);
     }
 
-    first = () => {
-      this.jumpTo(0);
+    _jumpTo = (idx, cb) => {
+      this.setState({ active: idx }, cb);
     }
 
     // TODO
@@ -52,102 +54,194 @@ function StateManager(Component) {
   }
 }
 
-/* Creates Step Config and manages step state */
-function ConfigCreator(Component) {
-  return class StepConfig extends React.Component {
-
-    // needs work - might be unnecessary
-    createStepConfig = (elements) => {
-      return arrayAssure(elements).reduce((acc, step, i) => {
-        return acc.concat([{
-          name: step.props.name || i.toString(),
-          number: i + 1,
-          isFirst: i === 0,
-          isLast: i === arrayAssure(elements).length + 1,
-          componentClass: step.props.componentClass,
-          componentProps: step.props.componentProps,
-          buttons: arrayAssure(step.props.children).reduce((inAcc, button, j) => {
-            return inAcc.concat([{
-              children: button.props.children,
-              componentClass: button.props.componentClass || 'button',
-              componentProps: button.props.componentProps,
-              role: button.props.role,
-              onClick: e => {
-                this.props.navActions[button.props.role]();
-                button.props.onClick && button.props.onClick(e);
-              }
-            }])
-          }, []),
-        }]);
-      }, []);
-    }
-
-    render() {
-      const stepConfig = this.createStepConfig(this.props.children);
-
-      return (
-        <Component {...{
-          ...this.props,
-          stepConfig,
-          step: stepConfig[this.props.activeStepNumber],
-        }} />
-      );
-    }
-  }
-}
-
 StepButton.propTypes = {
   componentClass: PT.oneOfType([PT.func, PT.string]),
   componentProps: PT.object,
-  role: PT.oneOf(['next', 'back', 'first'])
+  role: PT.oneOf(['next', 'back', 'first']),
+  isFirst: PT.bool,
+  isLast: PT.bool,
+  navActions: PT.object,
+  number: PT.number,
+  postRole: PT.func,
+  preRole: PT.func,
 };
 
 StepButton.defaultProps = {
-}
-
-export function StepButton(props) {
-  return props;
-}
-
-Step.propTypes = {
-  componentClass: PT.oneOfType([PT.func, PT.string]),
-  componentProps: PT.object,
-  name: PT.string,
-  stepNumber: PT.number
+  componentClass: 'button',
+  componentProps: {},
+  isFirst: false,
+  isLast: false,
+  navActions: {},
+  number: 0,
+  postRole: _e,
+  preRole: _e,
+  role: _e,
 };
 
-Step.defaultProps = {
-  componentClass: 'div'
-}
-
-export function Step(props) {
-  return props;
-}
-
-Wizard.propTypes = {};
-Wizard.defaultProps = {};
-
-/* Wizard render of active step */
-export function Wizard({step}) {
-  let wizClass = `whatever-wizard ww-step--${step.number}`;
-  if (step.isFirst) { wizClass += ' ww-step--first'; }
-  if (step.isLast)  { wizClass += ' ww-step--last'; }
+export function StepButton({
+  componentClass: Cmp,
+  componentProps,
+  navActions,
+  postRole,
+  preRole,
+  role,
+  ...props
+}) {
+  const onClick = () => {
+    const go = preRole();
+    if ( go || typeof go === 'undefined' ) {
+      if ( typeof role === 'string' ) {
+        navActions[role](postRole);
+      } else {
+        role(navActions, postRole);
+      }
+    }
+  }
 
   return (
-    <div className={wizClass}>
-      <main className='ww-step'>
-        <step.componentClass {...{...step, ...step.componentProps, stepNumber: step.number }} />
-      </main>
-      <nav className='ww-nav'>
-        {step.buttons.map((sb, i) =>
-          <sb.componentClass {...{...sb.componentProps, children: sb.children, key: i, onClick: sb.onClick }} />
-        )}
-      </nav>
-    </div>
+    <Cmp {...{
+      ...componentProps,
+      ...props,
+      onClick
+    }}>{props.children}</Cmp>
   );
 }
 
-export const WhateverWizard = StateManager(ConfigCreator(Wizard));
+
+
+export class Step extends React.Component {
+
+  static propTypes = {
+    componentClass: PT.oneOfType([PT.func, PT.string]),
+    componentProps: PT.object,
+    displayNumber: PT.number,
+    isFirst: PT.bool,
+    isLast: PT.bool,
+    navActions: PT.object,
+    number: PT.number,
+  };
+
+  static defaultProps = {
+    componentClass: 'div',
+    componentProps: {},
+    className: '',
+    displayNumber: 0,
+    isFirst: false,
+    isLast: false,
+    navActions: {},
+    number: 0,
+  };
+
+  make = (elements, props) =>
+    elements.reduce((acc, curr, i, all) => {
+      const elem = {
+        ...curr,
+        props: {
+          ...curr.props,
+          ...props,
+      }};
+      return ([...acc, elem]);
+    }, []);
+
+  render() {
+    const {
+      activeStepNumber,
+      componentClass: Cmp,
+      componentProps,
+      displayNumber,
+      isFirst,
+      isLast,
+      navActions,
+      number,
+      ...props
+    } = this.props;
+
+    const active = (number === activeStepNumber);
+
+    const className = cx(
+      `ww-step ww-step--${displayNumber}`,
+      {'ww-step--last': isLast, 'ww-step--first': isFirst, 'ww-step--active': active}
+    );
+
+    const style = !active ? {display: 'none'} : {};
+
+    const propsToChildren = {navActions, number, isFirst, isLast};
+
+    return (
+      <div {...{className, style}}>
+        <Cmp {...{
+          ...componentProps,
+          ...props,
+          displayNumber,
+          isFirst,
+          isLast,
+          navActions,
+          number
+        }} />
+        <div {...{className: 'ww-button-bar'}}>
+          {this.make(arrayAssure(props.children), propsToChildren)}
+        </div>
+      </div>
+    );
+  }
+}
+
+
+export class Wizard extends React.Component {
+  static propTypes = {
+    activeStepNumber: PT.number,
+    navActions: PT.object,
+  };
+
+  static defaultProps = {
+    activeStepNumber: 0,
+    navActions: {},
+  };
+
+  makeNumber = (i, total) => ({
+    number: i,
+    displayNumber: i + 1,
+    isFirst: i === 0,
+    isLast: i === total,
+  });
+
+  make = (elements, props, counterCb = this.makeNumber) =>
+    elements.reduce((acc, curr, i, all) => {
+      const elem = {
+        ...curr,
+        props: {
+          ...curr.props,
+          ...props,
+          ...counterCb(i, all.length - 1),
+      }};
+      return ([...acc, elem]);
+    }, []);
+
+
+  render() {
+    const {
+      activeStepNumber,
+      children,
+      navActions
+    } = this.props;
+    const propsToChildren = {activeStepNumber, navActions};
+
+    const className = cx('whatever-wizard', {
+      'ww-first-is-active':
+        0 === activeStepNumber,
+      'ww-last-is-active':
+        (arrayAssure(children).length - 1) === activeStepNumber
+    });
+
+    return (
+      <div {...{className}}>
+        {this.make(arrayAssure(children), propsToChildren)}
+      </div>
+    );
+  }
+}
+
+export const WhateverWizard = StateManager(Wizard);
 
 export default {
   WhateverWizard,
