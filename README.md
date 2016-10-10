@@ -1,13 +1,17 @@
 # react-whatever-wizard
 Declarative component based wizard
-- no configs or step arrays with complex objects
 
 Provides:
 - wizard props in your view components
 - manages which page to show and roles to change the page
 - functions for before and after page change
-- classes for active step status
+- BEM like classes for CSS, scoped by `ww`
 - declare buttons inside steps like html
+- keeps elements on page, adds `display: none` style
+
+Doesn't Provide:
+- does not manage saving form fields
+- no configs or step arrays with complex objects
 
 ## Example
 `wizard.jsx`
@@ -36,6 +40,10 @@ const Step = (props) =>
 
 ## Docs
 
+### Step
+Props `componentClass` is a `class`, `React.createComponent`, or function. As props, it will receive
+`displayNumber`, `number`, `isFirst`, `isLast`, and `navActions`.
+
 ### `StepButton`
 There is no `onClick` for `StepButton`, not through the Component itself nor `componentProps`.
 Instead you have `preRole`, `role`, and `postRole` functions.
@@ -62,3 +70,4 @@ It is provided as the second argument to role.
 ### `navActions: object`
 #### `action` function(callback)`
 actions:  `back`, `first`, `next`
+

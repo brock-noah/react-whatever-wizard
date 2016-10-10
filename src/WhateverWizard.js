@@ -73,15 +73,17 @@ StepButton.defaultProps = {
   isLast: false,
   navActions: {},
   number: 0,
-  role: () => {},
+  postRole: _e,
+  preRole: _e,
+  role: _e,
 };
 
 export function StepButton({
   componentClass: Cmp,
   componentProps,
   navActions,
-  postRole = () => {},
-  preRole = () => {},
+  postRole,
+  preRole,
   role,
   ...props
 }) {
