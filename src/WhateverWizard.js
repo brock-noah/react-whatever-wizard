@@ -20,7 +20,7 @@ function StateManager(Component) {
     }
 
     next = (cb = _e) => {
-      if (this.state.active + 1 < arrayAssure(this.props.children).length) {
+      if (this.state.active < arrayAssure(this.props.children).length - 1) {
         this.setState({ active: this.state.active + 1 }, cb);
       }
     }
