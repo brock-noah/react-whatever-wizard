@@ -11,8 +11,9 @@ const SomeStep = (props) =>
 
 const AnotherStep = (props) =>
   <div>
-    <h1>Step {props.displayNumber}</h1>
+    <h1>Step {props.displayNumber} / {props.totalSteps}</h1>
     <p>This is another step</p>
+    <p>Actions available: {Object.keys(props.navActions).join(', ')}</p>
     <button onClick={props.navActions.first}>Restart</button>
   </div>;
 
@@ -29,6 +30,7 @@ class Example extends Component {
               postRole={() => alert('???')}
             >Help Me</StepButton>
             <StepButton role="next">Next</StepButton>
+            <StepButton role="last">Skip All</StepButton>
           </Step>
           <Step componentClass={AnotherStep}>
             <StepButton role="back">Back</StepButton>

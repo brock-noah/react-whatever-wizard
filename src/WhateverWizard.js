@@ -14,31 +14,37 @@ function StateManager(Component) {
     };
 
     back = (cb = _e) => {
-      this.setState({ active: this.state.active - 1 }, cb);
+      if (this.state.active > 0) {
+        this.setState({ active: this.state.active - 1 }, cb);
+      }
     }
 
     next = (cb = _e) => {
-      this.setState({ active: this.state.active + 1 }, cb);
+      if (this.state.active < arrayAssure(this.props.children).length - 1) {
+        this.setState({ active: this.state.active + 1 }, cb);
+      }
     }
 
     first = (cb = _e) => {
-      this._jumpTo(0);
+      this._jumpTo(0, cb);
+    }
+
+    last = (cb = _e) => {
+      this._jumpTo(arrayAssure(this.props.children).length - 1, cb);
     }
 
     _jumpTo = (idx, cb) => {
-      this.setState({ active: idx }, cb);
+      if (idx >= 0 && idx < arrayAssure(this.props.children).length - 1) {
+        this.setState({ active: idx }, cb);
+      }
     }
-
-    // TODO
-    // last = (last) => {
-    //   this.jumpTo(last);
-    // }
 
     generate = () => {
       return ({
         back: this.back,
         next: this.next,
-        first: this.first
+        first: this.first,
+        last: this.last,
       });
     }
 
@@ -47,7 +53,8 @@ function StateManager(Component) {
         <Component {...{
           ...this.props,
           navActions: this.generate(),
-          activeStepNumber: this.state.active
+          activeStepNumber: this.state.active,
+          totalSteps: arrayAssure(this.props.children).length
         }} />
       );
     }
@@ -57,7 +64,7 @@ function StateManager(Component) {
 StepButton.propTypes = {
   componentClass: PT.oneOfType([PT.func, PT.string]),
   componentProps: PT.object,
-  role: PT.oneOf(['next', 'back', 'first']),
+  role: PT.oneOf(['next', 'back', 'first', 'last']),
   isFirst: PT.bool,
   isLast: PT.bool,
   navActions: PT.object,
@@ -153,6 +160,7 @@ export class Step extends React.Component {
       isLast,
       navActions,
       number,
+      totalSteps,
       ...props
     } = this.props;
 
@@ -165,7 +173,7 @@ export class Step extends React.Component {
 
     const style = !active ? {display: 'none'} : {};
 
-    const propsToChildren = {navActions, number, isFirst, isLast};
+    const propsToChildren = {navActions, number, isFirst, isLast, totalSteps};
 
     return (
       <div {...{className, style}}>
@@ -176,8 +184,10 @@ export class Step extends React.Component {
           isFirst,
           isLast,
           navActions,
-          number
+          number,
+          totalSteps,
         }} />
+        <hr/>
         <div {...{className: 'ww-button-bar'}}>
           {this.make(arrayAssure(props.children), propsToChildren)}
         </div>
@@ -222,9 +232,10 @@ export class Wizard extends React.Component {
     const {
       activeStepNumber,
       children,
-      navActions
+      navActions,
+      totalSteps,
     } = this.props;
-    const propsToChildren = {activeStepNumber, navActions};
+    const propsToChildren = {activeStepNumber, navActions, totalSteps};
 
     const className = cx('whatever-wizard', {
       'ww-first-is-active':
