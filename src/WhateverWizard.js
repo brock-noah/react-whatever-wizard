@@ -52,9 +52,11 @@ function StateManager(Component) {
       return (
         <Component {...{
           ...this.props,
-          navActions: this.generate(),
-          activeStepNumber: this.state.active,
-          totalSteps: arrayAssure(this.props.children).length
+          wizardStateManager: {
+            actions: this.generate(),
+            active: this.state.active,
+            total: arrayAssure(this.props.children).length
+          }
         }} />
       );
     }
@@ -88,7 +90,7 @@ StepButton.defaultProps = {
 export function StepButton({
   componentClass: Cmp,
   componentProps,
-  navActions,
+  actions,
   postRole,
   preRole,
   role,
@@ -98,9 +100,9 @@ export function StepButton({
     const go = preRole();
     if ( go || typeof go === 'undefined' ) {
       if ( typeof role === 'string' ) {
-        navActions[role](postRole);
+        actions[role](postRole);
       } else {
-        role(navActions, postRole);
+        role(actions, postRole);
       }
     }
   }
@@ -121,22 +123,34 @@ export class Step extends React.Component {
   static propTypes = {
     componentClass: PT.oneOfType([PT.func, PT.string]),
     componentProps: PT.object,
-    displayNumber: PT.number,
-    isFirst: PT.bool,
-    isLast: PT.bool,
-    navActions: PT.object,
-    number: PT.number,
+    wizardStateManager: PT.shape({
+      active: PT.number,
+      actions: PT.shape({}),
+      total: PT.number,
+    }),
+    stepDetails: PT.shape({
+      displayNumber: PT.number,
+      isFirst: PT.bool,
+      isLast: PT.bool,
+      number: PT.number,
+    }),
   };
 
   static defaultProps = {
+    className: '',
     componentClass: 'div',
     componentProps: {},
-    className: '',
-    displayNumber: 0,
-    isFirst: false,
-    isLast: false,
-    navActions: {},
-    number: 0,
+    wizardStateManager: {
+      active: 0,
+      actions: {},
+      total: 0,
+    },
+    stepDetails: {
+      displayNumber: 0,
+      isFirst: false,
+      isLast: false,
+      number: 0,
+    },
   };
 
   make = (elements, props) =>
@@ -152,44 +166,47 @@ export class Step extends React.Component {
 
   render() {
     const {
-      activeStepNumber,
+      children,
       componentClass: Cmp,
       componentProps,
-      displayNumber,
-      isFirst,
-      isLast,
-      navActions,
-      number,
-      totalSteps,
-      ...props
+      scopeKey,
+      stepDetails,
+      stepDetails: {
+        displayNumber,
+        isFirst,
+        isLast,
+        number,
+      },
+      wizardStateManager,
+      wizardStateManager: {
+        actions,
+        active,
+        total,
+      },
     } = this.props;
 
-    const active = (number === activeStepNumber);
+    const stepActive = (number === active);
 
     const className = cx(
       `ww-step ww-step--${displayNumber}`,
-      {'ww-step--last': isLast, 'ww-step--first': isFirst, 'ww-step--active': active}
+      {'ww-step--last': isLast, 'ww-step--first': isFirst, 'ww-step--active': stepActive}
     );
 
-    const style = !active ? {display: 'none'} : {};
+    const style = !stepActive ? {display: 'none'} : {};
 
-    const propsToChildren = {navActions, number, isFirst, isLast, totalSteps};
+    const propsToChildren = {actions, number, isFirst, isLast, total};
+    const propsToComponent = { ...stepDetails, ...wizardStateManager };
 
     return (
       <div {...{className, style}}>
         <Cmp {...{
           ...componentProps,
-          ...props,
           displayNumber,
-          isFirst,
-          isLast,
-          navActions,
-          number,
-          totalSteps,
+          [scopeKey]: propsToComponent,
         }} />
         <hr/>
         <div {...{className: 'ww-button-bar'}}>
-          {this.make(arrayAssure(props.children), propsToChildren)}
+          {this.make(arrayAssure(children), propsToChildren)}
         </div>
       </div>
     );
@@ -199,13 +216,21 @@ export class Step extends React.Component {
 
 export class Wizard extends React.Component {
   static propTypes = {
-    activeStepNumber: PT.number,
-    navActions: PT.object,
+    scopeKey: PT.string,
+    wizardStateManager: PT.shape({
+      active: PT.number,
+      actions: PT.shape({}),
+      total: PT.number
+    }),
   };
 
   static defaultProps = {
-    activeStepNumber: 0,
-    navActions: {},
+    scopeKey: 'wizard',
+    wizardStateManager: {
+      active: 0,
+      actions: {},
+      total: 0,
+    },
   };
 
   makeNumber = (i, total) => ({
@@ -222,7 +247,7 @@ export class Wizard extends React.Component {
         props: {
           ...curr.props,
           ...props,
-          ...counterCb(i, all.length - 1),
+          stepDetails: counterCb(i, all.length - 1),
       }};
       return ([...acc, elem]);
     }, []);
@@ -230,23 +255,21 @@ export class Wizard extends React.Component {
 
   render() {
     const {
-      activeStepNumber,
       children,
-      navActions,
-      totalSteps,
+      scopeKey,
+      wizardStateManager,
     } = this.props;
-    const propsToChildren = {activeStepNumber, navActions, totalSteps};
 
     const className = cx('whatever-wizard', {
       'ww-first-is-active':
-        0 === activeStepNumber,
+        0 === wizardStateManager.active,
       'ww-last-is-active':
-        (arrayAssure(children).length - 1) === activeStepNumber
+        (wizardStateManager.total - 1) === wizardStateManager.active
     });
 
     return (
       <div {...{className}}>
-        {this.make(arrayAssure(children), propsToChildren)}
+        {this.make(arrayAssure(children), {wizardStateManager, scopeKey})}
       </div>
     );
   }
