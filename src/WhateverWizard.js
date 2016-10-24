@@ -10,31 +10,31 @@ function arrayAssure(thing) {
 function StateManager(Component) {
   return class WizardState extends React.Component {
     state = {
-      active: 0
+      active: 1
     };
 
     back = (cb = _e) => {
-      if (this.state.active > 0) {
+      if (this.state.active > 1) {
         this.setState({ active: this.state.active - 1 }, cb);
       }
     }
 
     next = (cb = _e) => {
-      if (this.state.active < arrayAssure(this.props.children).length - 1) {
+      if (this.state.active < arrayAssure(this.props.children).length) {
         this.setState({ active: this.state.active + 1 }, cb);
       }
     }
 
     first = (cb = _e) => {
-      this._jumpTo(0, cb);
+      this._jumpTo(1, cb);
     }
 
     last = (cb = _e) => {
-      this._jumpTo(arrayAssure(this.props.children).length - 1, cb);
+      this._jumpTo(arrayAssure(this.props.children).length, cb);
     }
 
     _jumpTo = (idx, cb) => {
-      if (idx >= 0 && idx < arrayAssure(this.props.children).length - 1) {
+      if (idx >= 1 && idx < arrayAssure(this.props.children).length) {
         this.setState({ active: idx }, cb);
       }
     }
@@ -129,7 +129,6 @@ export class Step extends React.Component {
       total: PT.number,
     }),
     stepDetails: PT.shape({
-      displayNumber: PT.number,
       isFirst: PT.bool,
       isLast: PT.bool,
       number: PT.number,
@@ -146,7 +145,6 @@ export class Step extends React.Component {
       total: 0,
     },
     stepDetails: {
-      displayNumber: 0,
       isFirst: false,
       isLast: false,
       number: 0,
@@ -172,7 +170,6 @@ export class Step extends React.Component {
       scopeKey,
       stepDetails,
       stepDetails: {
-        displayNumber,
         isFirst,
         isLast,
         number,
@@ -188,8 +185,10 @@ export class Step extends React.Component {
     const stepActive = (number === active);
 
     const className = cx(
-      `ww-step ww-step--${displayNumber}`,
-      {'ww-step--last': isLast, 'ww-step--first': isFirst, 'ww-step--active': stepActive}
+      `ww-step ww-step--${number}`,
+      {'ww-step--first': isFirst,
+      'ww-step--last': isLast,
+      'ww-step--active': stepActive}
     );
 
     const style = !stepActive ? {display: 'none'} : {};
@@ -201,7 +200,6 @@ export class Step extends React.Component {
       <div {...{className, style}}>
         <Cmp {...{
           ...componentProps,
-          displayNumber,
           [scopeKey]: propsToComponent,
         }} />
         <hr/>
@@ -234,8 +232,7 @@ export class Wizard extends React.Component {
   };
 
   makeNumber = (i, total) => ({
-    number: i,
-    displayNumber: i + 1,
+    number: i + 1,
     isFirst: i === 0,
     isLast: i === total,
   });

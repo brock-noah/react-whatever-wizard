@@ -4,7 +4,7 @@ import { WhateverWizard, Step, StepButton } from './WhateverWizard';
 
 const ExStep = (props) =>
   <div style={{color: props.color || 'black'}}>
-    <h1>Step {props.ww.displayNumber} / {props.ww.total}</h1>
+    <h1>Step {props.ww.number} / {props.ww.total}</h1>
     <p>This is a step</p>
     <p>Last step? {String(props.ww.isLast)}</p>
     <button onClick={props.ww.actions.first}>Restart</button>
