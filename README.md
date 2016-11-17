@@ -40,34 +40,40 @@ const Step = (props) =>
 
 ## Docs
 
-### Step
-Props `componentClass` is a `class`, `React.createComponent`, or function. As props, it will receive
-`displayNumber`, `number`, `isFirst`, `isLast`, and `navActions`.
+#### Components
+### WhateverWizard
+#### scopekey: string
+key to nest step props for component, default `wizard`
 
-### `StepButton`
+### Step
+Props `componentClass` is a `class`, `React.createComponent`, or function. The component will render with props scoped under `wizard` as default, it will have keys:
+`number`: string. 1 based stepping number system
+`isFirst`: boolean
+`isLast`: boolean
+`actions`: object. how to change the page
+
+actions.each.is: string `first`, `back`, `next`
+
+### StepButton
 There is no `onClick` for `StepButton`, not through the Component itself nor `componentProps`.
 Instead you have `preRole`, `role`, and `postRole` functions.
 Role is the default click function available.
 To change the active step state, you will use the role prop.
 
-#### `preRole`
-##### `function(): boolean`
-Function fired before `role`.
-If you return a falsey value besides `undefined`, `role` and `postRole` will not fire.
-
-#### `role`
+##### StepButton Props
+#### role
 ##### `next`, `back`, `first`
 ##### `function(actions: object, postRole: function)`
 If role is a function, you have to call your `postRole` callback.
 
-#### `postRole`
+#### preRole
+##### `function(): boolean`
+Function fired before `role`.
+If you return a falsey value besides `undefined`, `role` and `postRole` will not fire.
+
+#### postRole
 ##### `function()`
-A callback after the state (`React.setState`) has upated.
+A callback after the state (`React.Component.setState`) has upated.
 If role is a function, you will have to call this function.
 It is provided as the second argument to role.
-
-
-### `navActions: object`
-#### `action` function(callback)`
-actions:  `back`, `first`, `next`
 
