@@ -42,16 +42,16 @@ const Step = (props) =>
 
 #### Components
 ### WhateverWizard
+##### Props
 #### scopekey: string
 key to nest step props for component, default `wizard`
 
 ### Step
 Props `componentClass` is a `class`, `React.createComponent`, or function. The component will render with props scoped under `wizard` as default, it will have keys:
-`number`: string. 1 based stepping number system
-`isFirst`: boolean
-`isLast`: boolean
-`actions`: object. how to change the page
-
+- `number`: string. 1 based stepping number system
+- `isFirst`: boolean
+- `isLast`: boolean
+- `actions`: object. how to change the page
 actions.each.is: string `first`, `back`, `next`
 
 ### StepButton
@@ -60,7 +60,7 @@ Instead you have `preRole`, `role`, and `postRole` functions.
 Role is the default click function available.
 To change the active step state, you will use the role prop.
 
-##### StepButton Props
+##### Props
 #### role
 ##### `next`, `back`, `first`
 ##### `function(actions: object, postRole: function)`
