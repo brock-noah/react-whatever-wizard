@@ -31,9 +31,9 @@ Doesn't Provide:
 ```
 const Step = (props) =>
   <div style={{color: props.color || 'black'}}>
-    <h1>Step {props.displayNumber}</h1>
-    (props.isLast) &&
-      <button onClick={props.navActions.first}>Restart</button>
+    <h1>Step {props.wizard.number}</h1>
+    (props.wizard.isLast) &&
+      <button onClick={props.wizard.actions.first}>Restart</button>
   </div>;
 ```
 
@@ -47,7 +47,11 @@ const Step = (props) =>
 key to nest step props for component, default `wizard`
 
 ### Step
-Props `componentClass` is a `class`, `React.createComponent`, or function. The component will render with props scoped under `wizard` as default, it will have keys:
+#### Props
+`componentClass`: `class`, `React.createComponent`, `function`
+`componentProps`: `object` props for `componentClass`
+
+The component will render with props scoped under `wizard` as default, it will have keys:
 - `number`: string. 1 based stepping number system
 - `isFirst`: boolean
 - `isLast`: boolean
@@ -62,7 +66,7 @@ To change the active step state, you will use the role prop.
 
 ##### Props
 #### role
-##### `next`, `back`, `first`
+##### `next`, `back`, `first`: string
 ##### `function(actions: object, postRole: function)`
 If role is a function, you have to call your `postRole` callback.
 
