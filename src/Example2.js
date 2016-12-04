@@ -11,6 +11,11 @@ const ExStep = (props) =>
   </div>;
 
 class Example extends React.Component {
+
+  submit = () => alert('Thank you')
+
+  validate = () => confirm('Submit?')
+
   render() {
     return (
       <div className="Example">
@@ -22,6 +27,7 @@ class Example extends React.Component {
           </Step>
           <Step componentClass={ExStep} componentProps={{color: 'crimson'}}>
             <StepButton role="back">Back</StepButton>
+            <StepButton preRole={this.validate} role={this.submit}>Done</StepButton>
           </Step>
         </WhateverWizard>
       </div>
