@@ -65,9 +65,10 @@ To change the active step state, you will use the role prop.
 
 ##### Props
 #### role
-##### `next`, `back`, `first`: string
+##### `next`, `back`, `first`, `last`: string
 ##### `function(actions: object, postRole: function)`
-If role is a function, you have to call your `postRole` callback.
+Either a string for predefined navagation, or a function.
+If role is a function, you have to call your `postRole` callback. Actions are the predefined navagation options.
 
 #### preRole
 ##### `function(): boolean`
@@ -81,10 +82,10 @@ If role is a function, you will have to call this function.
 It is provided as the second argument to role.
 
 
-Your Component
+
 The component class for `Step` will receive the following extra props under the `WhateverWizard` prop `scopeKey`:
 - `number` Type: number (1 based step number system)
 - `total` Type: number
 - `isFirst` Type: boolean
 - `isLast` Type: boolean
-- `actions.{first, back, next}` Type: object (how to change the page)
+- `actions.{first, back, next, last}` Type: object (how to change the page)
