@@ -1,11 +1,8 @@
-import React, { PropTypes as PT } from 'react';
+import React, { Children, PropTypes as PT } from 'react';
 import cx from 'classnames';
 
 /* Util */
 const _e = () => {};
-function arrayAssure(thing) {
-  return Array.isArray(thing) ? thing : [thing];
-}
 
 function StateManager(Component) {
   return class WizardState extends React.Component {
@@ -20,7 +17,7 @@ function StateManager(Component) {
     }
 
     next = (cb = _e) => {
-      if (this.state.active < arrayAssure(this.props.children).length) {
+      if (this.state.active < Children.count(this.props.children)) {
         this.setState({ active: this.state.active + 1 }, cb);
       }
     }
@@ -30,11 +27,11 @@ function StateManager(Component) {
     }
 
     last = (cb = _e) => {
-      this._jumpTo(arrayAssure(this.props.children).length, cb);
+      this._jumpTo(Children.count(this.props.children), cb);
     }
 
     _jumpTo = (idx, cb) => {
-      if (idx >= 1 && idx < arrayAssure(this.props.children).length) {
+      if (idx >= 1 && idx < Children.count(this.props.children)) {
         this.setState({ active: idx }, cb);
       }
     }
@@ -55,7 +52,7 @@ function StateManager(Component) {
           wizardStateManager: {
             actions: this.generate(),
             active: this.state.active,
-            total: React.Children.count(this.props.children),
+            total: Children.count(this.props.children),
           }
         }} />
       );
@@ -151,17 +148,6 @@ export class Step extends React.Component {
     },
   };
 
-  make = (elements, props) =>
-    elements.reduce((acc, curr, i, all) => {
-      const elem = {
-        ...curr,
-        props: {
-          ...curr.props,
-          ...props,
-      }};
-      return ([...acc, elem]);
-    }, []);
-
   render() {
     const {
       children,
@@ -204,7 +190,15 @@ export class Step extends React.Component {
         }} />
         <hr/>
         <div {...{className: 'ww-button-bar'}}>
-          {this.make(arrayAssure(children), propsToChildren)}
+          {
+            Children.map(children, (kid, i) => ({
+              ...kid,
+              props: {
+                ...kid.props,
+                ...propsToChildren,
+              }
+            }))
+          }
         </div>
       </div>
     );
@@ -234,21 +228,8 @@ export class Wizard extends React.Component {
   makeNumber = (i, total) => ({
     number: i + 1,
     isFirst: i === 0,
-    isLast: i === total,
+    isLast: i === (total - 1),
   });
-
-  make = (elements, props, counterCb = this.makeNumber) =>
-    elements.reduce((acc, curr, i, all) => {
-      const elem = {
-        ...curr,
-        props: {
-          ...curr.props,
-          ...props,
-          stepDetails: counterCb(i, all.length - 1),
-      }};
-      return ([...acc, elem]);
-    }, []);
-
 
   render() {
     const {
@@ -266,7 +247,17 @@ export class Wizard extends React.Component {
 
     return (
       <div {...{className}}>
-        {this.make(arrayAssure(children), {wizardStateManager, scopeKey})}
+        {
+          Children.map(children, (kid, i) => ({
+            ...kid,
+            props: {
+              ...kid.props,
+              wizardStateManager,
+              scopeKey,
+              stepDetails: this.makeNumber(i, wizardStateManager.total),
+            }
+          }))
+        }
       </div>
     );
   }
