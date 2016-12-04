@@ -4,17 +4,17 @@ import { WhateverWizard, Step, StepButton } from './WhateverWizard';
 
 const SomeStep = (props) =>
   <div style={{color: props.color || 'black'}}>
-    <h1>Step {props.displayNumber}</h1>
+    <h1>Step {props.wizard.number}</h1>
     <p>This is a step</p>
-    <p>Last step? {String(props.isLast)}</p>
+    <p>Last step? {String(props.wizard.isLast)}</p>
   </div>;
 
 const AnotherStep = (props) =>
   <div>
-    <h1>Step {props.displayNumber} / {props.totalSteps}</h1>
+    <h1>Step {props.wizard.number} / {props.wizard.total}</h1>
     <p>This is another step</p>
-    <p>Actions available: {Object.keys(props.navActions).join(', ')}</p>
-    <button onClick={props.navActions.first}>Restart</button>
+    <p>Actions available: {Object.keys(props.wizard.actions).join(', ')}</p>
+    <button onClick={props.wizard.actions.first}>Restart</button>
   </div>;
 
 class Example extends Component {
