@@ -31,7 +31,7 @@ function StateManager(Component) {
     }
 
     _jumpTo = (idx, cb) => {
-      if (idx >= 1 && idx < Children.count(this.props.children)) {
+      if (idx >= 1 && idx <= Children.count(this.props.children)) {
         this.setState({ active: idx }, cb);
       }
     }
