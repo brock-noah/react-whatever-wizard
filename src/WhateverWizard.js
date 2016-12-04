@@ -55,7 +55,7 @@ function StateManager(Component) {
           wizardStateManager: {
             actions: this.generate(),
             active: this.state.active,
-            total: arrayAssure(this.props.children).length
+            total: React.Children.count(this.props.children),
           }
         }} />
       );
