@@ -17,29 +17,32 @@ Doesn't Provide:
 `RealWizardary.jsx`
 ```
 import { WhateverWizard, Step, StepButton } from './WhateverWizard';
-import MyStep from './';
+import MyStep from './MyStep';
 
-<WhateverWizard>
-  <Step componentClass={MyStep} componentProps={{color: 'goldenrod'}}>
-    <StepButton role="next">Next</StepButton>
-  </Step>
-  <Step componentClass={MyStep}>
-    <StepButton role="back" componentProps={{title: 'Go Back'}}>Back</StepButton>
-    <StepButton
-      preRole={() => confirm('Submit?')}
-      role={() => alert('Thank you')}
-    >Done</StepButton>
-  </Step>
-</WhateverWizard>
+export default (props) =>
+  <WhateverWizard>
+    <Step componentClass={MyStep} componentProps={{color: 'goldenrod'}}>
+      <a href="/">Cancel</a>
+      <StepButton role="next">Next</StepButton>
+    </Step>
+    <Step componentClass={MyStep}>
+      <StepButton role="back" componentProps={{title: 'Go Back'}}>Back</StepButton>
+      <StepButton
+        preRole={() => confirm('Submit?')}
+        role={() => alert('Thank you')}
+      >Done</StepButton>
+    </Step>
+  </WhateverWizard>;
 ```
 
 `MyStep.jsx`
 ```
-const MyStep = (props) =>
+export default (props) =>
   <div style={{color: props.color || 'black'}}>
     <h1>Step {props.wizard.number} of {props.wizard.total}</h1>
-    (props.wizard.isLast) &&
-      <button onClick={props.wizard.actions.first}>Restart</button>
+    Component
+    {(props.wizard.isLast) &&
+      <button onClick={props.wizard.actions.first}>Restart</button>}
   </div>;
 ```
 

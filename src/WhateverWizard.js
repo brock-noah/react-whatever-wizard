@@ -80,7 +80,7 @@ StepButton.defaultProps = {
   navActions: {},
   number: 0,
   postRole: _e,
-  preRole: _e,
+  preRole: () => true,
   role: _e,
 };
 
@@ -94,8 +94,7 @@ export function StepButton({
   ...props
 }) {
   const onClick = () => {
-    const go = preRole();
-    if ( go || typeof go === 'undefined' ) {
+    if ( preRole() ) {
       if ( typeof role === 'string' ) {
         actions[role](postRole);
       } else {
