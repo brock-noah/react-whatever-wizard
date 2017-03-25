@@ -4,6 +4,16 @@ import cx from 'classnames';
 /* Util */
 const _e = () => {};
 
+const BasicLayout = props =>
+  (<div>
+    <h4>Complete These Steps</h4>
+    <hr/>
+    {props.children}
+    <hr/>
+    {props.wizard.number} / {props.wizard.total}
+    {props.wizard.buttons}
+  </div>);
+
 function StateManager(Component) {
   return class WizardState extends React.Component {
     state = {
@@ -120,6 +130,7 @@ export class Step extends React.Component {
   static propTypes = {
     componentClass: PT.oneOfType([PT.func, PT.string]),
     componentProps: PT.object,
+    layout: PT.func,
     wizardStateManager: PT.shape({
       active: PT.number,
       actions: PT.shape({}),
@@ -135,6 +146,7 @@ export class Step extends React.Component {
   static defaultProps = {
     className: '',
     componentClass: 'div',
+    layout: props => props,
     componentProps: {},
     wizardStateManager: {
       active: 0,
@@ -160,6 +172,7 @@ export class Step extends React.Component {
         isLast,
         number,
       },
+      layoutComponent: Layout,
       wizardStateManager,
       wizardStateManager: {
         actions,
@@ -179,28 +192,27 @@ export class Step extends React.Component {
 
     const style = !stepActive ? {display: 'none'} : {};
 
-    const propsToChildren = {actions, number, isFirst, isLast, total};
+    const buttons = Children.map(children, (kid, i) => ({
+      ...kid,
+      props: {
+        ...kid.props,
+        actions,
+      }
+    }))
+
+    const propsToLayout = { actions, number, isFirst, isLast, total, buttons };
     const propsToComponent = { ...stepDetails, ...wizardStateManager };
 
+    debugger
     return (
-      <div {...{className, style}}>
-        <Cmp {...{
-          ...componentProps,
-          [scopeKey]: propsToComponent,
-        }} />
-        <hr/>
-        <div {...{className: 'ww-button-bar'}}>
-          {
-            Children.map(children, (kid, i) => ({
-              ...kid,
-              props: {
-                ...kid.props,
-                ...propsToChildren,
-              }
-            }))
-          }
-        </div>
-      </div>
+      <span {...{className, style}}>
+        <Layout {...{[scopeKey]: propsToLayout}}>
+          <Cmp {...{
+            ...componentProps,
+            [scopeKey]: propsToComponent,
+          }} />
+        </Layout>
+      </span>
     );
   }
 }
@@ -209,6 +221,7 @@ export class Step extends React.Component {
 export class Wizard extends React.Component {
   static propTypes = {
     scopeKey: PT.string,
+    layoutComponent: PT.func,
     wizardStateManager: PT.shape({
       active: PT.number,
       actions: PT.shape({}),
@@ -217,6 +230,7 @@ export class Wizard extends React.Component {
   };
 
   static defaultProps = {
+    layoutComponent: BasicLayout,
     scopeKey: 'wizard',
     wizardStateManager: {
       active: 0,
@@ -234,6 +248,7 @@ export class Wizard extends React.Component {
   render() {
     const {
       children,
+      layoutComponent,
       scopeKey,
       wizardStateManager,
     } = this.props;
@@ -253,6 +268,7 @@ export class Wizard extends React.Component {
             props: {
               ...kid.props,
               wizardStateManager,
+              layoutComponent,
               scopeKey,
               stepDetails: this.makeNumber(i, wizardStateManager.total),
             }

@@ -33,6 +33,7 @@ class Example extends Component {
             <StepButton role="last">Skip All</StepButton>
           </Step>
           <Step componentClass={AnotherStep}>
+            <span>?</span>
             <StepButton role="back">Back</StepButton>
             <StepButton role="next" preRole={() => confirm('go')}>Proceed</StepButton>
           </Step>

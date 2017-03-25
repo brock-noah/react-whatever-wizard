@@ -50,12 +50,19 @@ const MyStep = (props) =>
 ### WhateverWizard
 ##### Props
 #### `scopekey`: string Default: wizard
-Key to nest step props for component.
+Key to nest step props for component. Used by `layoutComponent` and `componentClass`.
+
+#### `layoutComponent`: `class`, `React.createComponent`, `function`
+The layout that renders with each step. Where buttons should be placed, progress bar, step number, etc.
+Is effected by `scopeKey`.
 
 ### Step
 ##### Props
 #### `componentClass`: `class`, `React.createComponent`, `function`
+The component to render for that step. This component will receive wizard props under the `scopeKey`.
+
 #### `componentProps`: `object` of props for `componentClass`
+The props for the component.
 
 ### StepButton
 Currently, there is no `onClick` for `StepButton`, not through the Component itself nor `componentProps`.
