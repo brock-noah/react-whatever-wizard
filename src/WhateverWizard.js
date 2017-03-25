@@ -203,7 +203,6 @@ export class Step extends React.Component {
     const propsToLayout = { actions, number, isFirst, isLast, total, buttons };
     const propsToComponent = { ...stepDetails, ...wizardStateManager };
 
-    debugger
     return (
       <span {...{className, style}}>
         <Layout {...{[scopeKey]: propsToLayout}}>
