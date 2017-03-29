@@ -2,16 +2,23 @@ import React, { Component } from 'react';
 import './Example.css';
 import { WhateverWizard, Step, StepButton } from './WhateverWizard';
 
+const Layout = props =>
+  <div>
+    <h3>Step {props.wizard.number} of {props.wizard.total}</h3>
+    <h4>{props.title}</h4>
+    {props.wizard.buttons}
+    <hr/>
+    {props.children}
+  </div>
+
 const SomeStep = (props) =>
   <div style={{color: props.color || 'black'}}>
-    <h1>Step {props.wizard.number}</h1>
     <p>This is a step</p>
     <p>Last step? {String(props.wizard.isLast)}</p>
   </div>;
 
 const AnotherStep = (props) =>
   <div>
-    <h1>Step {props.wizard.number} / {props.wizard.total}</h1>
     <p>This is another step</p>
     <p>Actions available: {Object.keys(props.wizard.actions).join(', ')}</p>
     <button onClick={props.wizard.actions.first}>Restart</button>
@@ -22,7 +29,7 @@ class Example extends Component {
     return (
       <div className="Example">
         <h1>WhateverWizard</h1>
-        <WhateverWizard>
+        <WhateverWizard layoutComponent={Layout} layoutProps={{title: 'Enter Data'}}>
           <Step componentClass={SomeStep} componentProps={{color: 'slateblue'}}>
             <StepButton
               preRole={() => alert('welcome to help')}
@@ -32,8 +39,7 @@ class Example extends Component {
             <StepButton role="next">Next</StepButton>
             <StepButton role="last">Skip All</StepButton>
           </Step>
-          <Step componentClass={AnotherStep}>
-            <span>?</span>
+          <Step componentClass={AnotherStep} layoutProps={{title: 'Customize Data'}}>
             <StepButton role="back">Back</StepButton>
             <StepButton role="next" preRole={() => confirm('go')}>Proceed</StepButton>
           </Step>

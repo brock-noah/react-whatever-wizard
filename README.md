@@ -49,7 +49,7 @@ const MyStep = (props) =>
 #### Components
 ### WhateverWizard
 ##### Props
-#### `scopekey`: string Default: wizard
+#### `scopeKey`: string Default: wizard
 Key to nest step props for component. Used by `layoutComponent` and `componentClass`.
 
 #### `layoutComponent`: `class`, `React.createComponent`, `function`

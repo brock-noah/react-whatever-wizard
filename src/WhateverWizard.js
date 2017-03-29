@@ -6,12 +6,12 @@ const _e = () => {};
 
 const BasicLayout = props =>
   (<div>
-    <h4>Complete These Steps</h4>
+    <h4>Each Step Has the Same layout {props.title}</h4>
+    {props[props.scopeKey].number} / {props[props.scopeKey].total}
     <hr/>
     {props.children}
     <hr/>
-    {props.wizard.number} / {props.wizard.total}
-    {props.wizard.buttons}
+    {props[props.scopeKey].buttons}
   </div>);
 
 function StateManager(Component) {
@@ -173,6 +173,8 @@ export class Step extends React.Component {
         number,
       },
       layoutComponent: Layout,
+      layoutProps,
+      parentLayoutProps,
       wizardStateManager,
       wizardStateManager: {
         actions,
@@ -200,12 +202,16 @@ export class Step extends React.Component {
       }
     }))
 
-    const propsToLayout = { actions, number, isFirst, isLast, total, buttons };
+    const wizPropsToLayout = { actions, number, isFirst, isLast, total, buttons };
     const propsToComponent = { ...stepDetails, ...wizardStateManager };
 
     return (
       <span {...{className, style}}>
-        <Layout {...{[scopeKey]: propsToLayout}}>
+        <Layout {...{
+          ...parentLayoutProps,
+          ...layoutProps,
+          scopeKey,
+          [scopeKey]: wizPropsToLayout }}>
           <Cmp {...{
             ...componentProps,
             [scopeKey]: propsToComponent,
@@ -248,6 +254,7 @@ export class Wizard extends React.Component {
     const {
       children,
       layoutComponent,
+      layoutProps,
       scopeKey,
       wizardStateManager,
     } = this.props;
@@ -268,6 +275,7 @@ export class Wizard extends React.Component {
               ...kid.props,
               wizardStateManager,
               layoutComponent,
+              parentLayoutProps: layoutProps,
               scopeKey,
               stepDetails: this.makeNumber(i, wizardStateManager.total),
             }
