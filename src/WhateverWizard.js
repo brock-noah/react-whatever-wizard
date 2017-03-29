@@ -131,6 +131,7 @@ export class Step extends React.Component {
     componentClass: PT.oneOfType([PT.func, PT.string]),
     componentProps: PT.object,
     layout: PT.func,
+    layoutProps: PT.object,
     wizardStateManager: PT.shape({
       active: PT.number,
       actions: PT.shape({}),
@@ -227,6 +228,7 @@ export class Wizard extends React.Component {
   static propTypes = {
     scopeKey: PT.string,
     layoutComponent: PT.func,
+    layoutProps: PT.object,
     wizardStateManager: PT.shape({
       active: PT.number,
       actions: PT.shape({}),
