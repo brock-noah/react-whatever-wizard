@@ -132,6 +132,7 @@ export class Step extends React.Component {
     componentProps: PT.object,
     layout: PT.func,
     layoutProps: PT.object,
+    parentLayoutProps: PT.object,
     wizardStateManager: PT.shape({
       active: PT.number,
       actions: PT.shape({}),
