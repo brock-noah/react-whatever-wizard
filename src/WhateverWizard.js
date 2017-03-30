@@ -6,12 +6,13 @@ const _e = () => {};
 
 const BasicLayout = props =>
   (<div>
-    <h4>Each Step Has the Same layout {props.title}</h4>
     {props[props.scopeKey].number} / {props[props.scopeKey].total}
     <hr/>
     {props.children}
     <hr/>
-    {props[props.scopeKey].buttons}
+    <nav>
+      {props[props.scopeKey].buttons}
+    </nav>
   </div>);
 
 function StateManager(Component) {
