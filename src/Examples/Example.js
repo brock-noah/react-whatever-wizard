@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './Example.css';
-import { WhateverWizard, Step, StepButton } from './WhateverWizard';
+import { WhateverWizard, Step, StepButton } from '../WhateverWizard';
 
 const Layout = props =>
   <div>
