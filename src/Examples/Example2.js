@@ -1,5 +1,5 @@
 import React from 'react';
-import { WhateverWizard, Step, StepButton } from './WhateverWizard';
+import { WhateverWizard, Step, StepButton } from '../WhateverWizard';
 
 
 const ExStep = (props) =>
